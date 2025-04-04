@@ -5,6 +5,7 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler(async(req, res)=>{
+
     // get user data - name, email, password from frontend
     // validate password (strong password), email(unique)
     // check if user already exists - username, email
@@ -24,13 +25,19 @@ const registerUser = asyncHandler(async(req, res)=>{
         throw new ApiError(400, "All fields are required")
     }
 
-    const existedUser = User.findOne({
-        $or: [{username}, {email}]
-    })
+    console.log("Checking if user exists:", username, email);
+    const existedUser = await User.findOne({
+        $or: [{ username }, { email }]
+    });
+    console.log("User found:", existedUser);
+
 
     if(existedUser){
         throw new ApiError(409, "User already exists");
     }
+
+    console.log("📁 Multer files: ", req.files);
+
 
     const avatarLocalPath = req.files?.avatar[0]?.path;
     const coverImageLocalPath = req.files?.coverImage[0]?.path;
